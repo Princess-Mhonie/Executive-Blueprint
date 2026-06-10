@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Executive Operating Blueprint</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a0e1a;
+    --navy-mid: #111827;
+    --navy-light: #1a2236;
+    --navy-card: #141c2e;
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --gold-pale: #f5e6b8;
+    --cream: #faf6ef;
+    --white: #ffffff;
+    --muted: #8b95a8;
+    --green: #4caf82;
+    --blue-soft: #4a7fcb;
+    --rose: #c9605a;
+    --border: rgba(201,168,76,0.18);
+    --border-dim: rgba(255,255,255,0.06);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--navy);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Ambient background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 10% 0%, rgba(201,168,76,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 90% 100%, rgba(74,127,203,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 30% 30% at 50% 50%, rgba(10,14,26,0) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: 24px;
+    margin-bottom: 56px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid var(--border);
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .header-left {}
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 28px; height: 1px;
+    background: var(--gold);
+  }
+  .main-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .main-title em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+  .subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 300;
+    max-width: 520px;
+    line-height: 1.7;
+  }
+
+  .header-right {
+    text-align: right;
+  }
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(76,175,130,0.12);
+    border: 1px solid rgba(76,175,130,0.3);
+    border-radius: 24px;
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--green);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .date-stamp {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── PROGRESS STRIP ── */
+  .progress-strip {
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+    gap: 4px;
+    margin-bottom: 52px;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+  .prog-cell {
+    height: 5px;
+    border-radius: 3px;
+    background: var(--border-dim);
+    transition: background 0.3s;
+  }
+  .prog-cell.active { background: var(--gold); }
+  .prog-cell.active:nth-child(odd) { background: var(--gold-light); }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── STATS ROW ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+  .stat-card {
+    background: var(--navy-card);
+    border: 1px solid var(--border-dim);
+    border-radius: 12px;
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--gold-light);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── MAIN GRID ── */
+  .blueprint-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  /* ── COMPONENT CARD ── */
+  .comp-card {
+    background: var(--navy-card);
+    border: 1px solid var(--border-dim);
+    border-radius: 14px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    animation: fadeUp 0.7s ease both;
+  }
+  .comp-card:hover {
+    border-color: var(--border);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(201,168,76,0.1);
+  }
+  .comp-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 50% at 100% 0%, rgba(201,168,76,0.04), transparent);
+    pointer-events: none;
+  }
+
+  /* Accent strip colour variants */
+  .comp-card .accent-strip {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+  }
+  .accent-gold { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+  .accent-blue { background: linear-gradient(90deg, #4a7fcb, #7baae8); }
+  .accent-green { background: linear-gradient(90deg, #4caf82, #7fd4aa); }
+  .accent-rose  { background: linear-gradient(90deg, #c9605a, #e8908a); }
+  .accent-lavender { background: linear-gradient(90deg, #8b7fcb, #b5aee8); }
+
+  /* Grid spans */
+  .span-6  { grid-column: span 6; }
+  .span-4  { grid-column: span 4; }
+  .span-3  { grid-column: span 3; }
+  .span-8  { grid-column: span 8; }
+  .span-12 { grid-column: span 12; }
+
+  /* Card internals */
+  .card-session {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.8;
+  }
+  .card-num {
+    position: absolute;
+    top: 20px; right: 20px;
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.04);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+  .card-title em {
+    font-style: italic;
+    color: var(--gold-pale);
+  }
+  .card-desc {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.65;
+    margin-bottom: 16px;
+  }
+  .card-evidence {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .evidence-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+    color: rgba(250,246,239,0.7);
+  }
+  .evidence-item::before {
+    content: '→';
+    color: var(--gold);
+    font-size: 11px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    opacity: 0.7;
+  }
+
+  /* Tags */
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .tag-gold { background: rgba(201,168,76,0.14); color: var(--gold-light); border: 1px solid rgba(201,168,76,0.25); }
+  .tag-blue { background: rgba(74,127,203,0.14); color: #7baae8; border: 1px solid rgba(74,127,203,0.25); }
+  .tag-green { background: rgba(76,175,130,0.14); color: #7fd4aa; border: 1px solid rgba(76,175,130,0.25); }
+  .tag-rose  { background: rgba(201,96,90,0.14);  color: #e8908a; border: 1px solid rgba(201,96,90,0.25); }
+  .tag-lav   { background: rgba(139,127,203,0.14); color: #b5aee8; border: 1px solid rgba(139,127,203,0.25); }
+
+  /* Divider card — full width, used as a sessions cluster header */
+  .cluster-header {
+    grid-column: span 12;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0 0;
+    margin-top: 8px;
+  }
+  .cluster-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--gold);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .cluster-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── BOTTOM INTENT BANNER ── */
+  .intent-banner {
+    background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(74,127,203,0.06));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 40px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: center;
+    animation: fadeUp 0.8s 0.5s ease both;
+  }
+  .intent-body {}
+  .intent-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .intent-title em { font-style: italic; color: var(--gold-light); }
+  .intent-text {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 580px;
+  }
+  .intent-seal {
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .seal-ring {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(201,168,76,0.06);
+    position: relative;
+  }
+  .seal-ring::before {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,168,76,0.2);
+  }
+  .seal-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+  .seal-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .comp-card:nth-child(1)  { animation-delay: 0.15s; }
+  .comp-card:nth-child(2)  { animation-delay: 0.20s; }
+  .comp-card:nth-child(3)  { animation-delay: 0.25s; }
+  .comp-card:nth-child(4)  { animation-delay: 0.30s; }
+  .comp-card:nth-child(5)  { animation-delay: 0.35s; }
+  .comp-card:nth-child(6)  { animation-delay: 0.38s; }
+  .comp-card:nth-child(7)  { animation-delay: 0.41s; }
+  .comp-card:nth-child(8)  { animation-delay: 0.44s; }
+  .comp-card:nth-child(9)  { animation-delay: 0.47s; }
+  .comp-card:nth-child(10) { animation-delay: 0.50s; }
+  .comp-card:nth-child(11) { animation-delay: 0.53s; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .span-6, .span-4, .span-3, .span-8 { grid-column: span 12; }
+    .page { padding: 28px 18px 60px; }
+    .header { grid-template-columns: 1fr; }
+    .header-right { text-align: left; }
+    .intent-banner { grid-template-columns: 1fr; }
+    .intent-seal { display: none; }
+  }
+  @media (max-width: 600px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .progress-strip { grid-template-columns: repeat(11, 1fr); gap: 3px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="eyebrow">Executive Operating Blueprint</div>
+      <h1 class="main-title">The <em>Thinking</em><br>Behind the Work</h1>
+      <p class="subtitle">Eleven components. Each one evidence of deliberate thinking — not just attendance. This is the architecture of an executive who operates at the highest level.</p>
+    </div>
+    <div class="header-right">
+      <div class="status-badge"><span class="status-dot"></span> Active Board</div>
+      <div class="date-stamp" id="datestamp"></div>
+    </div>
+  </header>
+
+  <!-- PROGRESS STRIP -->
+  <div class="progress-strip" id="progressStrip"></div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num">11</div>
+      <div class="stat-label">Blueprint Components</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">7</div>
+      <div class="stat-label">Session Clusters</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">100<span style="font-size:18px">%</span></div>
+      <div class="stat-label">Thinking Evidenced</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="font-size:28px; padding-top:4px">EOB</div>
+      <div class="stat-label">Operating Standard</div>
+    </div>
+  </div>
+
+  <!-- ════════ BLUEPRINT GRID ════════ -->
+  <div class="section-label">Blueprint Components</div>
+
+  <div class="blueprint-grid">
+
+    <!-- CLUSTER 1: Sessions 1 & 2 -->
+    <div class="cluster-header">
+      <span class="cluster-title">Sessions 1 & 2 — Foundation</span>
+      <span class="cluster-line"></span>
+    </div>
+
+    <!-- 01. Partnership Philosophy -->
+    <div class="comp-card span-6">
+      <div class="accent-strip accent-gold"></div>
+      <div class="card-num">01</div>
+      <div class="card-session">Session 1 · Component 01</div>
+      <div class="card-title">Partnership <em>Philosophy</em></div>
+      <div class="card-desc">
+        The foundational doctrine that governs how I engage with every principal, colleague, and stakeholder. Not a preference — a philosophy built on values, boundaries, and purpose.
+      </div>
+      <div class="card-evidence">
+        <div class="evidence-item">Defined non-negotiables and working style declaration</div>
+        <div class="evidence-item">Principal relationship framework articulated</div>
+        <div class="evidence-item">Values-to-action alignment documented</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-gold">Core Doctrine</span>
+        <span class="tag tag-gold">Relationship Design</span>
+      </div>
+    </div>
+
+    <!-- 02. Communication Protocol Suite -->
+    <div class="comp-card span-6">
+      <div class="accent-strip accent-gold"></div>
+      <div class="card-num">02</div>
+      <div class="card-session">Session 2 · Component 02</div>
+      <div class="card-title">Communication <em>Protocol Suite</em></div>
+      <div class="card-desc">
+        A comprehensive communication system — not just how to write emails, but how information flows, gets triaged, and lands with zero ambiguity at every level of the organisation.
+      </div>
+      <div class="card-evidence">
+        <div class="evidence-item">FYI / FYA / Action triage framework</div>
+        <div class="evidence-item">Escalation matrix with clear thresholds</div>
+        <div class="evidence-item">Zero-ambiguity close standard applied</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-gold">Communication</span>
+        <span class="tag tag-gold">Triage System</span>
+      </div>
+    </div>
+
+    <!-- CLUSTER 2: Sessions 3 & 11 -->
+    <div class="cluster-header">
+      <span class="cluster-title">Sessions 3 & 11 — Identity</span>
+      <span class="cluster-line"></span>
+    </div>
+
+    <!-- 03. Personal Operating Principles -->
+    <div class="comp-card span-12">
+      <div class="accent-strip accent-blue"></div>
+      <div class="card-num">03</div>
+      <div class="card-session">Sessions 3 & 11 · Component 03</div>
+      <div class="card-title">Personal <em>Operating Principles</em></div>
+      <div class="card-desc">
+        The internal compass that guides every decision, interaction, and response under pressure. Principles that don't bend when circumstances get difficult — they become the anchor.
+      </div>
+      <div class="card-evidence">
+        <div class="evidence-item">Core principles articulated with behavioural indicators</div>
+        <div class="evidence-item">Tested under simulated high-stakes scenarios (Session 11)</div>
+        <div class="evidence-item">Reflection on growth between Session 3 and Session 11</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-blue">Identity</span>
+        <span class="tag tag-blue">Decision North Star</span>
+        <span class="tag tag-blue">Character Under Pressure</span>
+      </div>
+    </div>
+
+    <!-- CLUSTER 3: Sessions 4 & 5 -->
+    <div class="cluster-header">
+      <span class="cluster-title">Sessions 4 & 5 — Systems & Technology</span>
+      <span class="cluster-line"></span>
+    </div>
+
+    <!-- 04. Workflow Blueprint -->
+    <div class="comp-card span-6">
+      <div class="accent-strip accent-green"></div>
+      <div class="card-num">04</div>
+      <div class="card-session">Session 4 · Component 04</div>
+      <div class="card-title">Workflow <em>Blueprint</em></div>
+      <div class="card-desc">
+        The architecture of a day, week, and quarter. How capacity is protected, priorities are sequenced, and deep work is defended against chaos.
+      </div>
+      <div class="card-evidence">
+        <div class="evidence-item">Daily and weekly rhythm structures designed</div>
+        <div class="evidence-item">Capacity management thresholds set</div>
+        <div class="evidence-item">Interruption handling protocol documented</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-green">Operations</span>
+        <span class="tag tag-green">Time Architecture</span>
+      </div>
+    </div>
+
+    <!-- 05. Technology Stack & Automation Library -->
+    <div class="comp-card span-6">
+      <div class="accent-strip accent-green"></div>
+      <div class="card-num">05</div>
+      <div class="card-session">Session 5 · Component 05</div>
+      <div class="card-title">Technology Stack &amp; <em>Automation Library</em></div>
+      <div class="card-desc">
+        A curated, opinionated selection of tools and automated workflows that extend capacity without adding noise. Every tool earns its place by solving a real problem.
+      </div>
+      <div class="card-evidence">
+        <div class="evidence-item">Tool stack mapped to specific operational functions</div>
+        <div class="evidence-item">Automation triggers and workflows catalogued</div>
+        <div class="evidence-item">AI integration points identified and deployed</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-green">Tech</span>
+        <span class="tag tag-green">Automation</span>
+        <span class="tag tag-green">AI Integration</span>
+      </div>
+    </div>
+
+    <!-- CLUSTER 4: Sessions 6, 7 & 8 -->
+    <div class="cluster-header">
+      <span class="cluster-title">Sessions 6, 7 & 8 — Governance & Strategy</span>
+      <span class="cluster-line"></span>
+    </div>
+
+    <!-- 06. Security Appendix -->
+    <div class="comp-card span-4">
+      <div class="accent-strip accent-rose"></div>
+      <div class="card-num">06</div>
+      <div class="card-session">Session 6 · Component 06</div>
+      <div class="card-title">Security <em>Appendix</em></div>
+      <div class="card-desc">
+        Threat awareness, data governance, and operational security protocols. The silent layer that protects the principal and the organisation.
+      </div>
+      <div class="card-evidence">
+        <div class="evidence-item">Threat landscape mapped</div>
+        <div class="evidence-item">Data handling and access protocols</div>
+        <div class="evidence-item">SOP for sensitive information management</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-rose">Security</span>
+        <span class="tag tag-rose">Governance</span>
+      </div>
+    </div>
+
+    <!-- 07. Decision Protocol -->
+    <div class="comp-card span-4">
+      <div class="accent-strip accent-rose"></div>
+      <div class="card-num">07</div>
+      <div class="card-session">Session 7 · Component 07</div>
+      <div class="card-title">Decision <em>Protocol</em></div>
+      <div class="card-desc">
+        A structured decision framework that removes ambiguity, reduces cognitive load, and ensures every decision — big or small — is made with the right information and authority.
+      </div>
+      <div class="card-evidence">
+        <div class="evidence-item">Decision authority matrix defined</div>
+        <div class="evidence-item">Escalation vs. resolution criteria set</div>
+        <div class="evidence-item">Decision documentation standard applied</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-rose">Decision-Making</span>
+        <span class="tag tag-rose">Authority Mapping</span>
+      </div>
+    </div>
+
+    <!-- 08. Stakeholder Playbook -->
+    <div class="comp-card span-4">
+      <div class="accent-strip accent-rose"></div>
+      <div class="card-num">08</div>
+      <div class="card-session">Session 8 · Component 08</div>
+      <div class="card-title">Stakeholder <em>Playbook</em></div>
+      <div class="card-desc">
+        The relationship management system for every key stakeholder: internal, external, board, vendor, and government. Influence without manipulation; strategy without ego.
+      </div>
+      <div class="card-evidence">
+        <div class="evidence-item">Stakeholder map with engagement cadences</div>
+        <div class="evidence-item">Communication strategies per stakeholder tier</div>
+        <div class="evidence-item">Crisis communication annexe included</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-rose">Stakeholders</span>
+        <span class="tag tag-rose">Influence</span>
+      </div>
+    </div>
+
+    <!-- CLUSTER 5: Sessions 9 & 10 -->
+    <div class="cluster-header">
+      <span class="cluster-title">Sessions 9 & 10 — Evidence in Action</span>
+      <span class="cluster-line"></span>
+    </div>
+
+    <!-- 09. Simulation Evidence -->
+    <div class="comp-card span-6">
+      <div class="accent-strip accent-lavender"></div>
+      <div class="card-num">09</div>
+      <div class="card-session">Session 9 · Component 09</div>
+      <div class="card-title">Simulation <em>Evidence</em></div>
+      <div class="card-desc">
+        This is where thinking becomes proof. Real-world simulated crises, decisions under pressure, and edge cases navigated — documented as evidence of readiness, not just learning.
+      </div>
+      <div class="card-evidence">
+        <div class="evidence-item">Crisis scenario simulations completed and debriefed</div>
+        <div class="evidence-item">Response decisions documented with rationale</div>
+        <div class="evidence-item">Lessons translated into updated protocols</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-lav">Live Proof</span>
+        <span class="tag tag-lav">Crisis Readiness</span>
+        <span class="tag tag-lav">Decision Under Pressure</span>
+      </div>
+    </div>
+
+    <!-- 10. Project Leadership Toolkit -->
+    <div class="comp-card span-6">
+      <div class="accent-strip accent-lavender"></div>
+      <div class="card-num">10</div>
+      <div class="card-session">Session 10 · Component 10</div>
+      <div class="card-title">Project Leadership <em>Toolkit</em></div>
+      <div class="card-desc">
+        The operational toolkit that makes project leadership repeatable. Templates, trackers, kick-off frameworks, and close-out protocols — ready to deploy on any brief.
+      </div>
+      <div class="card-evidence">
+        <div class="evidence-item">Project brief and kick-off templates</div>
+        <div class="evidence-item">Progress tracking and escalation trigger system</div>
+        <div class="evidence-item">Stakeholder update cadence and reporting format</div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-lav">Project Ops</span>
+        <span class="tag tag-lav">Repeatability</span>
+        <span class="tag tag-lav">Delivery</span>
+      </div>
+    </div>
+
+    <!-- 11. Synthesis Component -->
+    <div class="cluster-header">
+      <span class="cluster-title">Cross-Programme Synthesis</span>
+      <span class="cluster-line"></span>
+    </div>
+
+    <div class="comp-card span-12" style="background: linear-gradient(135deg, #141c2e, #0f1a2e);">
+      <div class="accent-strip" style="background: linear-gradient(90deg, var(--gold), #4a7fcb, var(--green));"></div>
+      <div class="card-num" style="font-size:64px; opacity:0.03;">11</div>
+      <div class="card-session">Sessions 3 & 11 · Component 11 — The Whole Picture</div>
+      <div class="card-title" style="font-size:22px;">Executive Identity &amp; <em>Blueprint Synthesis</em></div>
+      <div class="card-desc" style="max-width:800px;">
+        Where all eleven components converge into a single, coherent operating identity. This is not a summary — it is the proof that every component connects, that the thinking was integrated, and that this blueprint belongs to one executive with a clear point of view on how they lead.
+      </div>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 4px;">
+        <div class="card-evidence">
+          <div class="evidence-item">All 11 components interconnect demonstrably</div>
+          <div class="evidence-item">Personal operating voice is consistent throughout</div>
+        </div>
+        <div class="card-evidence">
+          <div class="evidence-item">Growth arc from Session 1 to Session 11 visible</div>
+          <div class="evidence-item">Blueprint is ready to deploy — not just to present</div>
+        </div>
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-gold">Synthesis</span>
+        <span class="tag tag-blue">Identity</span>
+        <span class="tag tag-green">Deployment-Ready</span>
+        <span class="tag tag-lav">Growth Evidence</span>
+      </div>
+    </div>
+
+  </div><!-- /blueprint-grid -->
+
+  <!-- INTENT BANNER -->
+  <div class="intent-banner">
+    <div class="intent-body">
+      <div class="intent-title">This board is not a portfolio.<br>It is an <em>operating declaration.</em></div>
+      <p class="intent-text">
+        Each component signals one thing clearly: the thinking has been done. Not memorised — internalised. Not attended — executed. Every piece here is evidence of an executive who does not wait to be shown the way, but builds the way for others to follow.
+      </p>
+    </div>
+    <div class="intent-seal">
+      <div class="seal-ring">
+        <div class="seal-num">EOB</div>
+        <div class="seal-text">Blueprint</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+  // Date stamp
+  const d = new Date();
+  document.getElementById('datestamp').textContent =
+    d.toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' }).toUpperCase();
+
+  // Progress strip
+  const strip = document.getElementById('progressStrip');
+  for (let i = 0; i < 11; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'prog-cell active';
+    strip.appendChild(cell);
+  }
+</script>
+</body>
+</html>
